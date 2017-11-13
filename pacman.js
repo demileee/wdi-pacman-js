@@ -1,11 +1,28 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
+var powerPellets = 4
 
 
 // Define your ghosts here
+var ghosts = [];
 
-// replace this comment with your four ghosts setup as objects
+newGhost = function(menuOption, name, colour, character) {
+  ghost = {
+    menu_option: menuOption,
+    name: name,
+    colour: colour,
+    character: character,
+    edible: false
+  };
+  ghosts.push(ghost);
+  return ghost;
+};
+
+var inky = newGhost(1, "Inky", "Red", "Shadow");
+var blinky = newGhost(2, "Blinky", "Cyan", "Speedy");
+var pinky = newGhost(3, "Pinky", "Pink", "Bashful");
+var clyde = newGhost(4, "Clyde", "Orange", "Pokey");
 
 
 // Draw the screen functionality
@@ -23,12 +40,23 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives + '\n\nPower-Pellets: ' + powerPellets);
 }
 
 function displayMenu() {
   console.log('\n\nSelect Option:\n');  // each \n creates a new line
   console.log('(d) Eat Dot');
+  if(powerPellets > 0) {
+    console.log('(p) Eat Power-Pellet')
+  }
+  ghosts.forEach(function(ghost) {
+    if(ghost.edible === true) {
+      edible = 'edible';
+    } else {
+      edible = 'inedible';
+    };
+    console.log('(' + ghost.menu_option + ') Eat ' + ghost.name + ' (' + edible + ')');
+  });
   console.log('(q) Quit');
 }
 
@@ -44,6 +72,32 @@ function eatDot() {
   score += 10;
 }
 
+function eatGhost(ghost) {
+  if(ghost.edible === false) {
+    console.log('\n' + ghost.colour + ' ' + ghost.name + ' killed Pacman!');
+    lives -= 1;
+    if(lives === 0) {
+      process.exit();
+    }
+  } else if(ghost.edible === true) {
+    score += 200;
+    ghost.edible = false;
+    console.log('\n' + ghost.character + ' ' + ghost.name + ' was eaten!');
+  };
+};
+
+function eatPowerPellet() {
+  if(powerPellets > 0) {
+    score += 50;
+    powerPellets -= 1;
+    ghosts.forEach(function(ghost) {
+      ghost.edible = true;
+    });
+  } else {
+    console.log(' No Power-Pellets Left!');
+  };
+};
+
 
 // Process Player's Input
 function processInput(key) {
@@ -55,6 +109,22 @@ function processInput(key) {
     case 'd':
       eatDot();
       break;
+    case 'p':
+      eatPowerPellet();
+      break
+    case '1':
+      eatGhost(ghosts[0]);
+      break;
+    case '2':
+      eatGhost(ghosts[1]);
+      break;
+    case '3':
+      eatGhost(ghosts[2]);
+      break;
+    case '4':
+      eatGhost(ghosts[3]);
+      break;
+
     default:
       console.log('\nInvalid Command!');
   }
